@@ -59,6 +59,8 @@ const char *p_task_adc 		= "Task ADC";
 
 /********************** external data declaration *****************************/
 
+extern ADC_HandleTypeDef hadc1;
+
 /********************** external functions definition ************************/
 void task_adc_init(void *parameters)
 {

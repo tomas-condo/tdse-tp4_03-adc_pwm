@@ -268,7 +268,7 @@ const task_cfg_t task_cfg_list[]	= {
 		{task_pwm_init,	task_pwm_update, NULL},
 };
 
-#define TASK_QTY	(sizeof(task_cfg_list)/sizeof(task_cfg_t))
+#define TASK_QTY (sizeof(task_cfg_list)/sizeof(task_cfg_t))
 
 /********************** internal functions declaration ***********************/
 
@@ -319,23 +319,7 @@ const char *p_app	= " ADC + PWM\n";
 uint32_t g_app_cnt;
 uint32_t g_app_time_us;
 
-/* Understanding “volatile” qualifier in C | Set 1 (Introduction)
- * Understanding “volatile” qualifier in C | Set 2 (Examples)
- * (https://www.geeksforgeeks.org/)
- */
-/*
- * The volatile keyword is intended to prevent the compiler from applying any
- * optimizations on objects that can change in ways that cannot be determined
- * by the compiler.
- * Objects declared as volatile are omitted from optimization because their
- * values can be changed by code outside the scope of current code at any time.
- * The system always reads the current value of a volatile object from the
- * memory location rather than keeping its value in a temporary register at the
- * point it is requested, even if a previous instruction asked for the value
- * from the same object.
- */
 volatile uint32_t g_app_tick_cnt;
-
 task_dta_t task_dta_list[TASK_QTY];
 
 /********************** external functions definition ************************/
@@ -362,7 +346,7 @@ void app_init(void)
 	g_app_cnt = G_APP_CNT_INI;
 
 	/* Print out: Application execution counter */
-	//LOGGER_LOG(" %s = %lu\n", GET_NAME(g_app_cnt), g_app_cnt);
+	LOGGER_LOG(" %s = %lu\n", GET_NAME(g_app_cnt), g_app_cnt);
 
 	/* Go through the task arrays */
 	for (index = 0; TASK_QTY > index; index++)
@@ -385,6 +369,7 @@ void app_init(void)
 
 void app_update(void)
 {
+
 	uint32_t index;
 	uint32_t cycle_counter;
 	uint32_t cycle_counter_time_us;
@@ -392,6 +377,7 @@ void app_update(void)
 	/* Check if it's time to run tasks */
 	if (G_APP_TICK_CNT_INI < g_app_tick_cnt)
     {
+
     	g_app_tick_cnt--;
 
     	/* Update App Counter */
