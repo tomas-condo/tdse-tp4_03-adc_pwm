@@ -52,7 +52,9 @@
 
 /********************** internal data declaration ****************************/
 
+
 /********************** internal functions declaration ***********************/
+HAL_StatusTypeDef ADC_Poll_Read(uint16_t *value);
 
 /********************** internal data definition *****************************/
 const char *p_task_adc 		= "Task ADC";
@@ -64,13 +66,43 @@ extern ADC_HandleTypeDef hadc1;
 /********************** external functions definition ************************/
 void task_adc_init(void *parameters)
 {
+	shared_data_type *shared_data = (shared_data_type *) parameters;
+
 	/* Print out: Task Initialized */
 	LOGGER_LOG("  %s is running - %s\r\n", GET_NAME(task_adc_init), p_task_adc);
 
+	shared_data->adc_end_of_conversion = false;
 }
 
 void task_adc_update(void *parameters)
 {
+
+	shared_data_type *shared_data = (shared_data_type *) parameters;
+
+	if (HAL_OK==ADC_Poll_Read(&shared_data->adc_value)) {
+		shared_data->adc_end_of_conversion = true;
+	}
+	else {
+		LOGGER_LOG("error\n");
+	}
 }
+
+
+
+//	Requests start of conversion, waits until conversion done
+HAL_StatusTypeDef ADC_Poll_Read(uint16_t *value) {
+	HAL_StatusTypeDef res;
+
+	res=HAL_ADC_Start(&hadc1);
+	if ( HAL_OK==res ) {
+		res=HAL_ADC_PollForConversion(&hadc1, 0);
+		if ( HAL_OK==res ) {
+			*value = HAL_ADC_GetValue(&hadc1);
+		}
+	}
+	return res;
+}
+
+
 
 /********************** end of file ******************************************/

@@ -7,6 +7,7 @@ extern "C" {
 #endif
 
 /********************** inclusions *******************************************/
+#include <stdbool.h>
 
 /********************** macros ***********************************************/
 
@@ -17,6 +18,12 @@ extern "C" {
 #define TEST_X (TEST_0)
 
 /********************** typedef **********************************************/
+
+typedef struct {
+	bool adc_end_of_conversion;
+	uint16_t adc_value;
+	uint16_t pwm_active;
+} shared_data_type;
 
 /********************** external data declaration ****************************/
 

@@ -37,6 +37,7 @@
 
 /********************** inclusions *******************************************/
 /* Project includes. */
+#include <stdlib.h>
 #include "main.h"
 
 /* Demo includes. */
@@ -49,19 +50,30 @@
 
 /********************** macros and definitions *******************************/
 
+#define STEP (2048)
+#define PERIOD (65535)
+
 /********************** internal data declaration ****************************/
 
 /********************** internal functions declaration ***********************/
+void setPWM(TIM_HandleTypeDef timer,
+            uint32_t channel,
+            uint16_t period,
+            uint16_t pulse);
 
 /********************** internal data definition *****************************/
 const char *p_task_pwm 		= "Task PWM";
 
 /********************** external data declaration *****************************/
+extern TIM_HandleTypeDef htim3;
 
 
 /********************** external functions definition ************************/
 void task_pwm_init(void *parameters)
 {
+	shared_data_type *shared_data = (shared_data_type *) parameters;
+
+	shared_data->pwm_active = 0;
 	/* Print out: Task Initialized */
 	LOGGER_LOG("  %s is running - %s\r\n", GET_NAME(task_pwm_init), p_task_pwm);
 }
@@ -69,6 +81,42 @@ void task_pwm_init(void *parameters)
 void task_pwm_update(void *parameters)
 {
 
+	static uint16_t period=PERIOD;
+	static int16_t step = STEP;
+
+	shared_data_type *shared_data = (shared_data_type *) parameters;
+
+	if ( shared_data->adc_end_of_conversion ) {
+		shared_data->adc_end_of_conversion = false;
+		setPWM(htim3, TIM_CHANNEL_1, period, shared_data->pwm_active);
+		if ( step>0 ) {
+			if ( period-step<=shared_data->pwm_active ) {
+				step = step * -1;
+			}
+		}
+		else {
+			if ( abs(step)>=shared_data->pwm_active ) {
+				step = step * -1;
+			}
+		}
+		shared_data->pwm_active = shared_data->pwm_active + step;
+	}
+}
+
+
+void setPWM(TIM_HandleTypeDef timer, uint32_t channel,
+            uint16_t period, uint16_t pulse) {
+  HAL_TIM_PWM_Stop(&timer, channel);
+  TIM_OC_InitTypeDef sConfigOC;
+  timer.Init.Period = period;
+  HAL_TIM_PWM_Init(&timer);
+
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = pulse;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  HAL_TIM_PWM_ConfigChannel(&timer, &sConfigOC, channel);
+  HAL_TIM_PWM_Start(&timer,channel);
 }
 
 /********************** end of file ******************************************/
