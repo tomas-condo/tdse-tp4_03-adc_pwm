@@ -1,0 +1,11 @@
+Se lee el valor del potenciómetro por ADC1 y se ajusta el duty cycle del PWM (TIM3_CH1)
+en proporción al valor medido, mientras más alto sea el valor del potenciómetro, mayor brillo va a tener la LED.
+
+Periféricos usados
+- ADC1, canal IN0
+- TIM3, canal 1 (PWM)
+- GPIO: PA0 (potenciómetro), PA6 (LED PWM)
+
+Resultados obtenidos:
+- Brillo del LED varía suavemente según la posición del potenciómetro.
+- Señal PWM medida con osciloscopio: duty cycle 0–100%.
